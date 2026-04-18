@@ -1,0 +1,13 @@
+# Dockerfile.dev — ds-profile (development)
+# Node 22 dev server with Astro hot reload
+
+FROM node:22-alpine
+WORKDIR /app
+ENV ASTRO_TELEMETRY_DISABLED=1
+
+COPY package*.json .npmrc ./
+RUN npm ci
+
+COPY . .
+EXPOSE 4321
+CMD ["npm", "run", "dev", "--", "--host", "0.0.0.0"]

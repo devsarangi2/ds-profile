@@ -1,0 +1,16 @@
+# docker-compose.yml — ds-profile (production preview)
+# Serves built static site via Nginx on port 14322
+# Usage: make preview
+
+services:
+  dsp-site:
+    image: dsp-site:latest
+    container_name: dsp-site
+    ports:
+      - "${PREVIEW_PORT:-14322}:80"
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD-SHELL", "wget -qO- http://localhost:80/ || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 3

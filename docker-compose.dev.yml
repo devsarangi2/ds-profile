@@ -1,0 +1,33 @@
+# docker-compose.dev.yml — ds-profile (development)
+# Astro dev server with bind mounts + watch mode on port 14321
+# Usage: make dev-docker
+
+services:
+  dsp-site:
+    build:
+      context: .
+      dockerfile: Dockerfile.dev
+    image: dsp-site:dev
+    container_name: dsp-site-dev
+    ports:
+      - "${DEV_PORT:-14321}:4321"
+    volumes:
+      - .:/app
+      - /app/node_modules
+    environment:
+      - ASTRO_TELEMETRY_DISABLED=1
+    develop:
+      watch:
+        - action: sync
+          path: ./src
+          target: /app/src
+        - action: sync
+          path: ./public
+          target: /app/public
+        - action: sync
+          path: ./tailwind.config.mjs
+          target: /app/tailwind.config.mjs
+        - action: rebuild
+          path: ./package.json
+        - action: rebuild
+          path: ./astro.config.mjs
