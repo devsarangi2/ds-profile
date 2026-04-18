@@ -59,19 +59,21 @@ const featuredProjects = (await getCollection('projects', ({ data }) => data.fea
   {posts.length > 0 && (
     <section class="max-w-4xl mx-auto px-6 py-12 border-t border-[#E5E7EB] dark:border-[#2D3748]">
       <h2 class="font-serif text-2xl font-bold mb-6 text-gray-900 dark:text-white">Recent Writing</h2>
-      <div class="flex flex-col gap-5">
+      <ul class="flex flex-col gap-5 list-none p-0">
         {posts.map((post) => (
-          <a href={`/blog/${post.id}`} class="group flex items-start justify-between gap-4 py-4 border-b border-[#E5E7EB] dark:border-[#2D3748] last:border-0">
-            <div>
-              <h3 class="font-semibold text-gray-900 dark:text-white group-hover:text-blue-600 dark:group-hover:text-blue-400 mb-1">{post.data.title}</h3>
-              <p class="text-sm text-[#6B7280] dark:text-[#94A3B8]">{post.data.excerpt}</p>
-            </div>
-            <time class="text-xs text-[#6B7280] dark:text-[#94A3B8] whitespace-nowrap mt-1">
-              {post.data.date.toLocaleDateString('en-US', { month: 'short', year: 'numeric' })}
-            </time>
-          </a>
+          <li>
+            <a href={`/blog/${post.id}`} aria-label={post.data.title} class="group flex items-start justify-between gap-4 py-4 border-b border-[#E5E7EB] dark:border-[#2D3748] last:border-0">
+              <div>
+                <h3 class="font-semibold text-gray-900 dark:text-white group-hover:text-blue-600 dark:group-hover:text-blue-400 mb-1">{post.data.title}</h3>
+                <p class="text-sm text-[#6B7280] dark:text-[#94A3B8]">{post.data.excerpt}</p>
+              </div>
+              <time class="text-xs text-[#6B7280] dark:text-[#94A3B8] whitespace-nowrap mt-1">
+                {post.data.date.toLocaleDateString('en-US', { month: 'short', year: 'numeric' })}
+              </time>
+            </a>
+          </li>
         ))}
-      </div>
+      </ul>
       <a href="/blog" class="inline-block mt-5 text-sm text-blue-600 dark:text-blue-400 hover:underline">All posts &rarr;</a>
     </section>
   )}
