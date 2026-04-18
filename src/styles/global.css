@@ -6,7 +6,7 @@
 
 @layer base {
   html {
-    @apply bg-white text-gray-900 dark:bg-[#0F1117] dark:text-[#F1F5F9];
+    @apply bg-background-light text-textPrimary-light dark:bg-background-dark dark:text-textPrimary-dark;
   }
   ::selection {
     @apply bg-blue-600/20;

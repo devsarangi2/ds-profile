@@ -7,6 +7,14 @@ export default {
   theme: {
     extend: {
       colors: {
+        background: {
+          light: '#FFFFFF',
+          dark: '#0F1117',
+        },
+        textPrimary: {
+          light: '#111827',
+          dark: '#F1F5F9',
+        },
         surface: {
           light: '#F8F9FA',
           dark: '#1A1D27',
