@@ -33,27 +33,79 @@ const currentPath = Astro.url.pathname;
       ))}
     </ul>
 
-    <!-- Dark mode toggle -->
-    <button
-      id="theme-toggle"
-      aria-label="Toggle dark mode"
-      class="p-2 rounded-lg text-[#6B7280] dark:text-[#94A3B8] hover:bg-[#F8F9FA] dark:hover:bg-[#1A1D27] transition-colors"
-    >
-      <svg id="icon-sun" class="w-5 h-5 hidden dark:block" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-          d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364-6.364l-.707.707M6.343 17.657l-.707.707M17.657 17.657l-.707-.707M6.343 6.343l-.707-.707M12 8a4 4 0 100 8 4 4 0 000-8z" />
-      </svg>
-      <svg id="icon-moon" class="w-5 h-5 block dark:hidden" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-          d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z" />
-      </svg>
-    </button>
+    <div class="flex items-center gap-2">
+      <!-- Dark mode toggle -->
+      <button
+        id="theme-toggle"
+        aria-label="Toggle dark mode"
+        class="p-2 rounded-lg text-[#6B7280] dark:text-[#94A3B8] hover:bg-[#F8F9FA] dark:hover:bg-[#1A1D27] transition-colors"
+      >
+        <svg id="icon-sun" class="w-5 h-5 hidden dark:block" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+            d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364-6.364l-.707.707M6.343 17.657l-.707.707M17.657 17.657l-.707-.707M6.343 6.343l-.707-.707M12 8a4 4 0 100 8 4 4 0 000-8z" />
+        </svg>
+        <svg id="icon-moon" class="w-5 h-5 block dark:hidden" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+            d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z" />
+        </svg>
+      </button>
+
+      <!-- Mobile hamburger button (visible on mobile only) -->
+      <button
+        id="mobile-menu-btn"
+        aria-label="Open navigation menu"
+        aria-expanded="false"
+        aria-controls="mobile-menu"
+        class="md:hidden p-2 rounded-lg text-[#6B7280] dark:text-[#94A3B8] hover:bg-[#F8F9FA] dark:hover:bg-[#1A1D27] transition-colors"
+      >
+        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path id="hamburger-icon" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
+          <path id="close-icon" class="hidden" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+        </svg>
+      </button>
+    </div>
   </nav>
 </header>
+
+<!-- Mobile menu panel -->
+<div
+  id="mobile-menu"
+  class="hidden md:hidden border-b border-[#E5E7EB] dark:border-[#2D3748] bg-white dark:bg-[#0F1117]"
+>
+  <ul class="max-w-4xl mx-auto px-6 py-4 flex flex-col gap-1 list-none">
+    {navLinks.map(({ href, label }) => (
+      <li>
+        <a
+          href={href}
+          class:list={[
+            'block py-2 px-3 rounded-lg text-sm font-medium transition-colors',
+            currentPath === href
+              ? 'text-blue-600 dark:text-blue-400 bg-blue-600/10'
+              : 'text-[#6B7280] dark:text-[#94A3B8] hover:text-blue-600 dark:hover:text-blue-400 hover:bg-[#F8F9FA] dark:hover:bg-[#1A1D27]',
+          ]}
+        >
+          {label}
+        </a>
+      </li>
+    ))}
+  </ul>
+</div>
 
 <script>
   document.getElementById('theme-toggle')?.addEventListener('click', () => {
     const isDark = document.documentElement.classList.toggle('dark');
     localStorage.setItem('theme', isDark ? 'dark' : 'light');
+  });
+
+  const mobileBtn = document.getElementById('mobile-menu-btn');
+  const mobileMenu = document.getElementById('mobile-menu');
+  const hamburgerIcon = document.getElementById('hamburger-icon');
+  const closeIcon = document.getElementById('close-icon');
+
+  mobileBtn?.addEventListener('click', () => {
+    const isOpen = mobileMenu?.classList.toggle('hidden') === false;
+    mobileBtn.setAttribute('aria-expanded', String(isOpen));
+    hamburgerIcon?.classList.toggle('hidden', isOpen);
+    closeIcon?.classList.toggle('hidden', !isOpen);
   });
 </script>
