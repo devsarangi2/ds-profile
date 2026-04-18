@@ -1,0 +1,41 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import { getCollection, render } from 'astro:content';
+
+export async function getStaticPaths() {
+  const projects = await getCollection('projects');
+  return projects.map((p) => ({ params: { id: p.id }, props: { project: p } }));
+}
+
+const { project } = Astro.props;
+const { Content } = await render(project);
+---
+<BaseLayout title={project.data.title} description={project.data.description}>
+  <article class="max-w-3xl mx-auto px-6 py-16">
+    {project.data.coverImage && (
+      <div class="rounded-xl overflow-hidden mb-10 h-64">
+        <img src={project.data.coverImage} alt={project.data.title} class="w-full h-full object-cover" />
+      </div>
+    )}
+    <div class="flex flex-wrap gap-2 mb-4">
+      {project.data.tags.map((tag) => (
+        <span class="px-2 py-0.5 bg-blue-600/10 text-blue-600 dark:text-blue-400 rounded text-xs">{tag}</span>
+      ))}
+    </div>
+    <h1 class="font-serif text-4xl font-bold text-gray-900 dark:text-white mb-4">{project.data.title}</h1>
+    <div class="flex gap-4 mb-10 text-sm">
+      {project.data.github && (
+        <a href={project.data.github} target="_blank" rel="noopener noreferrer" class="text-blue-600 dark:text-blue-400 hover:underline">GitHub &rarr;</a>
+      )}
+      {project.data.demo && (
+        <a href={project.data.demo} target="_blank" rel="noopener noreferrer" class="text-blue-600 dark:text-blue-400 hover:underline">Live Demo &rarr;</a>
+      )}
+    </div>
+    <div class="prose dark:prose-invert prose-lg max-w-none font-sans prose-headings:font-serif">
+      <Content />
+    </div>
+    <div class="mt-12 pt-6 border-t border-[#E5E7EB] dark:border-[#2D3748]">
+      <a href="/projects" class="text-sm text-[#6B7280] dark:text-[#94A3B8] hover:text-blue-600 dark:hover:text-blue-400">&larr; Back to projects</a>
+    </div>
+  </article>
+</BaseLayout>
