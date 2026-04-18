@@ -1,0 +1,8 @@
+- company: "Company Name"
+  title: "Job Title"
+  location: "City, Country"
+  start: "Jan 2022"
+  end: "Present"
+  bullets:
+    - "Led key initiative resulting in measurable outcome"
+    - "Built or improved something important"
