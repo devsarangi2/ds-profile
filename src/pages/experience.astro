@@ -1,0 +1,83 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import yaml from 'js-yaml';
+import { readFileSync } from 'fs';
+import { resolve } from 'path';
+
+const experience = yaml.load(readFileSync(resolve(process.cwd(), 'src/data/experience.yaml'), 'utf8')) as any[];
+const certifications = yaml.load(readFileSync(resolve(process.cwd(), 'src/data/certifications.yaml'), 'utf8')) as any[];
+const skills = yaml.load(readFileSync(resolve(process.cwd(), 'src/data/skills.yaml'), 'utf8')) as any[];
+---
+<BaseLayout title="Experience" description="Professional experience, certifications, and skills.">
+  <section class="max-w-4xl mx-auto px-6 py-16">
+    <h1 class="font-serif text-4xl font-bold text-gray-900 dark:text-white mb-12">Experience</h1>
+
+    <!-- Work Timeline -->
+    <div class="mb-16">
+      <h2 class="font-serif text-2xl font-semibold text-gray-900 dark:text-white mb-8">Work History</h2>
+      <div class="relative border-l-2 border-[#E5E7EB] dark:border-[#2D3748] pl-8 flex flex-col gap-10">
+        {experience.map((role) => (
+          <div class="relative">
+            <div class="absolute -left-[2.65rem] top-1 w-4 h-4 rounded-full bg-blue-600 ring-4 ring-white dark:ring-[#0F1117]" aria-hidden="true" />
+            <div class="flex items-start justify-between gap-4 mb-2">
+              <div>
+                <h3 class="font-semibold text-gray-900 dark:text-white">{role.title}</h3>
+                <p class="text-sm text-blue-600 dark:text-blue-400">{role.company}</p>
+              </div>
+              <span class="text-xs text-[#6B7280] dark:text-[#94A3B8] whitespace-nowrap">
+                {role.start} — {role.end}
+              </span>
+            </div>
+            <ul class="list-disc list-inside space-y-1">
+              {role.bullets.map((b: string) => (
+                <li class="text-sm text-[#6B7280] dark:text-[#94A3B8]">{b}</li>
+              ))}
+            </ul>
+          </div>
+        ))}
+      </div>
+    </div>
+
+    <!-- Certifications -->
+    <div class="mb-16">
+      <h2 class="font-serif text-2xl font-semibold text-gray-900 dark:text-white mb-8">Certifications</h2>
+      <ul class="grid sm:grid-cols-2 md:grid-cols-3 gap-5 list-none p-0">
+        {certifications.map((cert) => (
+          <li>
+            <a href={cert.url} target="_blank" rel="noopener noreferrer" aria-label={`${cert.name} by ${cert.issuer}`}
+              class="flex items-center gap-4 p-4 rounded-xl border border-[#E5E7EB] dark:border-[#2D3748] bg-[#F8F9FA] dark:bg-[#1A1D27] hover:shadow-md transition-shadow h-full">
+              {cert.badge && (
+                <img src={cert.badge} alt="" role="presentation" class="w-12 h-12 object-contain flex-shrink-0" />
+              )}
+              <div>
+                <p class="font-medium text-sm text-gray-900 dark:text-white">{cert.name}</p>
+                <p class="text-xs text-[#6B7280] dark:text-[#94A3B8]">{cert.issuer} &middot; {cert.date}</p>
+              </div>
+            </a>
+          </li>
+        ))}
+      </ul>
+    </div>
+
+    <!-- Skills -->
+    <div>
+      <h2 class="font-serif text-2xl font-semibold text-gray-900 dark:text-white mb-8">Skills</h2>
+      <div class="flex flex-col gap-6">
+        {skills.map((group: any) => (
+          <div>
+            <h3 class="text-xs font-semibold uppercase tracking-widest text-[#6B7280] dark:text-[#94A3B8] mb-3">{group.category}</h3>
+            <ul class="flex flex-wrap gap-2 list-none p-0">
+              {group.items.map((skill: string) => (
+                <li>
+                  <span class="px-3 py-1.5 bg-[#F8F9FA] dark:bg-[#1A1D27] border border-[#E5E7EB] dark:border-[#2D3748] rounded-lg text-sm text-gray-900 dark:text-[#F1F5F9]">
+                    {skill}
+                  </span>
+                </li>
+              ))}
+            </ul>
+          </div>
+        ))}
+      </div>
+    </div>
+  </section>
+</BaseLayout>
