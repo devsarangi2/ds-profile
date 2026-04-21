@@ -19,7 +19,7 @@ const posts = (await getCollection('blog', ({ data }) => !data.draft))
     <ul class="flex flex-col divide-y divide-[#E5E7EB] dark:divide-[#2D3748] list-none p-0">
       {posts.map((post) => (
         <li>
-          <a href={`/blog/${post.id}`} aria-label={post.data.title} class="group py-6 flex gap-6 items-start">
+          <a href={`/blog/${post.id}`} class="group py-6 flex gap-6 items-start">
             <time datetime={post.data.date.toISOString()} class="text-xs text-[#6B7280] dark:text-[#94A3B8] w-20 flex-shrink-0 mt-1">
               {post.data.date.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
             </time>

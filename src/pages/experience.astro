@@ -25,7 +25,7 @@ const skills = yaml.load(readFileSync(resolve(process.cwd(), 'src/data/skills.ya
                 <p class="text-sm text-blue-600 dark:text-blue-400">{role.company}</p>
               </div>
               <span class="text-xs text-[#6B7280] dark:text-[#94A3B8] whitespace-nowrap">
-                {role.start} — {role.end}
+                <time>{role.start}</time> — <time>{role.end}</time>
               </span>
             </div>
             <ul class="list-disc list-inside space-y-1">

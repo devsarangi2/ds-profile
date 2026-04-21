@@ -25,10 +25,10 @@ const { Content } = await render(project);
     <h1 class="font-serif text-4xl font-bold text-gray-900 dark:text-white mb-4">{project.data.title}</h1>
     <div class="flex gap-4 mb-10 text-sm">
       {project.data.github && (
-        <a href={project.data.github} target="_blank" rel="noopener noreferrer" class="text-blue-600 dark:text-blue-400 hover:underline">GitHub &rarr;</a>
+        <a href={project.data.github} target="_blank" rel="noopener noreferrer" aria-label={`${project.data.title} on GitHub`} class="text-blue-600 dark:text-blue-400 hover:underline">GitHub &rarr;</a>
       )}
       {project.data.demo && (
-        <a href={project.data.demo} target="_blank" rel="noopener noreferrer" class="text-blue-600 dark:text-blue-400 hover:underline">Live Demo &rarr;</a>
+        <a href={project.data.demo} target="_blank" rel="noopener noreferrer" aria-label={`${project.data.title} live demo`} class="text-blue-600 dark:text-blue-400 hover:underline">Live Demo &rarr;</a>
       )}
     </div>
     <div class="prose dark:prose-invert prose-lg max-w-none font-sans prose-headings:font-serif">

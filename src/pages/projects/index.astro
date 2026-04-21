@@ -18,7 +18,7 @@ const projects = await getCollection('projects');
     <ul class="grid md:grid-cols-2 gap-6 list-none p-0">
       {projects.map((p) => (
         <li>
-          <a href={`/projects/${p.id}`} aria-label={p.data.title} class="group block rounded-xl overflow-hidden border border-[#E5E7EB] dark:border-[#2D3748] hover:shadow-lg hover:-translate-y-0.5 transition-all h-full">
+          <a href={`/projects/${p.id}`} class="group block rounded-xl overflow-hidden border border-[#E5E7EB] dark:border-[#2D3748] hover:shadow-lg hover:-translate-y-0.5 transition-all h-full">
             {p.data.coverImage && (
               <div class="h-40 overflow-hidden">
                 <img src={p.data.coverImage} alt={p.data.title} class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" />

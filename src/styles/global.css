@@ -5,8 +5,9 @@
 @tailwind utilities;
 
 @layer base {
-  html {
-    @apply bg-background-light text-textPrimary-light dark:bg-background-dark dark:text-textPrimary-dark;
+  html,
+  body {
+    @apply bg-white text-gray-900 dark:bg-[#0F1117] dark:text-[#F1F5F9];
   }
   ::selection {
     @apply bg-blue-600/20;
