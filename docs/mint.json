@@ -1,0 +1,49 @@
+{
+  "$schema": "https://mintlify.com/schema.json",
+  "name": "ds-profile",
+  "logo": {
+    "dark": "/logo/dark.svg",
+    "light": "/logo/light.svg"
+  },
+  "favicon": "/favicon.svg",
+  "colors": {
+    "primary": "#2563EB",
+    "light": "#3B82F6",
+    "dark": "#1D4ED8"
+  },
+  "topbarLinks": [],
+  "topbarCtaButton": {
+    "name": "Dashboard",
+    "url": "http://localhost:5173/dashboard"
+  },
+  "tabs": [],
+  "anchors": [],
+  "navigation": [
+    {
+      "group": "Getting Started",
+      "pages": ["docs/quickstart", "docs/architecture"]
+    },
+    {
+      "group": "API Reference",
+      "pages": [
+        "docs/api/profiles",
+        "docs/api/employment",
+        "docs/api/projects",
+        "docs/api/skills",
+        "docs/api/variants",
+        "docs/api/ai",
+        "docs/api/settings"
+      ]
+    },
+    {
+      "group": "Features",
+      "pages": [
+        "docs/features/dashboard",
+        "docs/features/pdf-import",
+        "docs/features/variants",
+        "docs/features/ai-improve"
+      ]
+    }
+  ],
+  "footerSocials": {}
+}

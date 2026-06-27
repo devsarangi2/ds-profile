@@ -1,0 +1,81 @@
+---
+title: "Settings API"
+description: "Manage AI provider configuration"
+---
+
+## Overview
+
+Settings are loaded from the database on every request — never cached. This allows changing providers without restarting the server. API keys are stored server-side and never returned in responses.
+
+## Endpoints
+
+### GET /api/v1/settings/ai
+
+Returns current AI provider configuration (without API keys).
+
+**Response** `200 OK`
+```json
+{
+  "provider": "lm_studio",
+  "model": "local-model",
+  "base_url": "http://100.82.183.76:8080/v1",
+  "has_api_key": false,
+  "temperature": 0.7,
+  "max_tokens": 2048
+}
+```
+
+### PUT /api/v1/settings/ai
+
+Update AI provider configuration.
+
+**Body**
+```json
+{
+  "provider": "openrouter",
+  "model": "anthropic/claude-3-5-sonnet",
+  "api_key": "sk-...",
+  "temperature": 0.7,
+  "max_tokens": 2048
+}
+```
+
+Note: `api_key` is write-only. Once saved, `has_api_key: true` is returned but the key value is never exposed.
+
+### GET /api/v1/settings/ai/providers
+
+Returns the list of supported AI providers and their available models.
+
+**Response** `200 OK`
+```json
+[
+  {
+    "id": "lm_studio",
+    "name": "LM Studio",
+    "requires_api_key": false,
+    "requires_base_url": true,
+    "models": []
+  },
+  {
+    "id": "openrouter",
+    "name": "OpenRouter",
+    "requires_api_key": true,
+    "requires_base_url": false,
+    "models": ["anthropic/claude-3-5-sonnet", "openai/gpt-4o", "google/gemini-2.0-flash"]
+  },
+  {
+    "id": "anthropic",
+    "name": "Anthropic",
+    "requires_api_key": true,
+    "requires_base_url": false,
+    "models": ["claude-opus-4-5", "claude-sonnet-4-5", "claude-haiku-3-5"]
+  },
+  {
+    "id": "gemini",
+    "name": "Google Gemini",
+    "requires_api_key": true,
+    "requires_base_url": false,
+    "models": ["gemini-2.0-flash", "gemini-1.5-pro"]
+  }
+]
+```

@@ -1,0 +1,23 @@
+---
+title: "Dashboard"
+description: "Private profile management interface"
+---
+
+The dashboard (`/dashboard/*`) is the private interface for managing your master profile record.
+
+## Navigation
+
+| Route | Page | Description |
+|---|---|---|
+| `/dashboard/experience` | Employment List | Add, edit, delete jobs |
+| `/dashboard/experience/:id` | Employment Detail | Inline edit + projects |
+| `/dashboard/projects` | Projects List | All projects across employers |
+| `/dashboard/projects/:id` | Project Detail | Roles, tech stack, impact |
+| `/dashboard/skills` | Skills Manager | Skills grouped by category |
+| `/dashboard/variants` | Variants | Resume variants list |
+| `/dashboard/import` | PDF Import | Upload resume, review, merge |
+| `/dashboard/settings` | Settings | AI provider configuration |
+
+## Inline Editing
+
+Click any text field to edit it in place. Press **Esc** to cancel, **Enter** or **blur** to save. Changes are debounced 500ms before saving.

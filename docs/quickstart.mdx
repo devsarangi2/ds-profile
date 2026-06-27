@@ -1,0 +1,81 @@
+---
+title: "Quickstart"
+description: "Get ds-profile running locally in under 5 minutes"
+---
+
+## Prerequisites
+
+- Docker + Docker Compose
+- Node.js 22+
+- Python 3.12+
+
+## Local Development
+
+### 1. Clone and configure
+
+```bash
+git clone <repo>
+cd ds-profile
+cp .env.example .env
+```
+
+### 2. Start infrastructure
+
+```bash
+docker compose up -d db storage
+```
+
+This starts:
+- **PostgreSQL** on port 5432
+- **MinIO** (S3-compatible storage) on ports 9000/9001
+
+### 3. Start the backend
+
+```bash
+cd backend
+pip install -r requirements.txt
+alembic upgrade head        # run migrations
+uvicorn app.main:app --reload --port 8000
+```
+
+Backend available at `http://localhost:8000`. Docs at `http://localhost:8000/docs`.
+
+### 4. Start the frontend
+
+```bash
+cd frontend
+npm install
+npm run dev
+```
+
+Frontend available at `http://localhost:5173`.
+
+### 5. Optional: PDF parsing
+
+```bash
+docker compose up -d parser
+```
+
+Starts the Unstructured.io parser on port 8001. Required for PDF import.
+
+## Environment Variables
+
+See `.env.example` for all available variables. Key settings:
+
+| Variable | Default | Description |
+|---|---|---|
+| `DATABASE_URL` | postgres://... | PostgreSQL connection string |
+| `AUTH_DISABLED` | `false` | Set to `true` in dev to skip auth |
+| `DEFAULT_USER_ID` | `dev-user` | User ID used when auth is disabled |
+| `UNSTRUCTURED_BACKEND` | `local` | `local` (Docker) or `cloud` (Unstructured.io) |
+| `STORAGE_BACKEND` | `minio` | `minio` (Docker) or `supabase` |
+
+## Dev vs Prod
+
+| Feature | Dev | Prod |
+|---|---|---|
+| Auth | Disabled (`AUTH_DISABLED=true`) | Supabase JWT |
+| Database | Docker Postgres | Supabase Postgres |
+| Storage | Docker MinIO | Supabase Storage |
+| PDF Parser | Self-hosted Docker | Unstructured Cloud API (free tier) |
+| AI | LM Studio local | OpenRouter / Anthropic / Gemini |

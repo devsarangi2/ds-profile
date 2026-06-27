@@ -1,0 +1,17 @@
+---
+title: "PDF Import"
+description: "Upload your resume and extract data with AI"
+---
+
+The PDF import flow (`/dashboard/import`) is a 3-step wizard:
+
+1. **Upload** — Drag & drop or select a PDF (max 20MB)
+2. **Processing** — Unstructured.io parses the PDF; LLM extracts structured data
+3. **Review** — Diff view shows extracted fields. Accept field-by-field or "Accept all", then merge into master
+
+## How it works
+
+1. PDF → Unstructured.io → raw text elements
+2. Text elements → LLM (via LiteLLM) → structured JSON (name, employment[], skills[])
+3. Frontend shows diff against current master record
+4. User accepts/rejects per field → merged into master
