@@ -1,44 +1,82 @@
-# Astro Starter Kit: Minimal
+# ds-profile
 
-```sh
-npm create astro@latest -- --template minimal
+A full-stack profile management app. Think LinkedIn profile but yours — private dashboard for managing employment history, projects, skills, and certifications, with AI-assisted editing and resume variant generation.
+
+## Features
+
+- **Private dashboard** — Inline-edit all profile fields (Notion-style)
+- **Improve with AI** — One-click LLM rewriting for descriptions and impact statements
+- **PDF Import** — Upload your CV, Unstructured.io parses it, LLM extracts data, diff view, merge
+- **Resume Variants** — Paste a job description, AI tailors your master profile, stores only the deltas
+- **Public profile** — Read-only profile at `/`
+
+## Tech Stack
+
+| Layer | Tech |
+|---|---|
+| Frontend | Vite + React 19 + TypeScript + Tailwind v4 + shadcn/ui |
+| Backend | FastAPI + SQLAlchemy 2.0 + Alembic + LiteLLM |
+| Database | PostgreSQL 16 |
+| Storage | MinIO (dev) / Supabase Storage (prod) |
+| PDF Parsing | Unstructured.io self-hosted (dev) / Cloud (prod) |
+| AI | LM Studio (default) / OpenRouter / Anthropic / Gemini |
+| Testing | pytest + Playwright |
+
+## Quick Start
+
+```bash
+# 1. Clone and configure
+cp .env.example .env
+# Edit .env: set AUTH_DISABLED=true for local dev
+
+# 2. Start infrastructure
+docker compose up -d db storage
+
+# 3. Backend
+cd backend
+pip install -r requirements.txt
+alembic upgrade head
+uvicorn app.main:app --reload --port 8000
+
+# 4. Frontend (new terminal)
+cd frontend
+npm install
+npm run dev
 ```
 
-> 🧑‍🚀 **Seasoned astronaut?** Delete this file. Have fun!
+Open `http://localhost:5173/dashboard`.
 
-## 🚀 Project Structure
+## Optional: PDF Parsing
 
-Inside of your Astro project, you'll see the following folders and files:
-
-```text
-/
-├── public/
-├── src/
-│   └── pages/
-│       └── index.astro
-└── package.json
+```bash
+docker compose up -d parser
 ```
 
-Astro looks for `.astro` or `.md` files in the `src/pages/` directory. Each page is exposed as a route based on its file name.
+## Running Tests
 
-There's nothing special about `src/components/`, but that's where we like to put any Astro/React/Vue/Svelte/Preact components.
+```bash
+# Backend unit tests
+cd backend && pytest tests/unit/ -v
 
-Any static assets, like images, can be placed in the `public/` directory.
+# Frontend Playwright
+cd frontend && npx playwright test
+```
 
-## 🧞 Commands
+## AI Configuration
 
-All commands are run from the root of the project, from a terminal:
+Visit `/dashboard/settings` to configure your AI provider:
+- **LM Studio** (default, free, local GPU at `http://100.82.183.76:8080/v1`)
+- **OpenRouter** — requires API key
+- **Anthropic** — requires API key
+- **Google Gemini** — requires API key
 
-| Command                   | Action                                           |
-| :------------------------ | :----------------------------------------------- |
-| `npm install`             | Installs dependencies                            |
-| `npm run dev`             | Starts local dev server at `localhost:4321`      |
-| `npm run build`           | Build your production site to `./dist/`          |
-| `npm run preview`         | Preview your build locally, before deploying     |
-| `npm run astro ...`       | Run CLI commands like `astro add`, `astro check` |
-| `npm run astro -- --help` | Get help using the Astro CLI                     |
+## Environment
 
-## 👀 Want to learn more?
+See `.env.example` for all configuration options. Critical variables:
 
-Feel free to check [our documentation](https://docs.astro.build) or jump into our [Discord server](https://astro.build/chat).
-# Dev Sarangi Bio
+| Variable | Dev | Prod |
+|---|---|---|
+| `AUTH_DISABLED` | `true` | `false` |
+| `DATABASE_URL` | postgres://localhost | Supabase connection string |
+| `STORAGE_BACKEND` | `minio` | `supabase` |
+| `UNSTRUCTURED_BACKEND` | `local` | `cloud` |
