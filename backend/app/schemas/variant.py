@@ -56,3 +56,11 @@ class OverrideSuggestion(BaseModel):
 
 class GenerateVariantResponse(BaseModel):
     suggestions: list[OverrideSuggestion]
+
+
+class OverrideCreate(BaseModel):
+    entity_type: str
+    entity_id: str
+    field: str
+    original_value: str | None = None
+    overridden_value: str

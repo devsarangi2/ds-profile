@@ -8,7 +8,7 @@ import { CreateVariantModal } from '@/components/dashboard/CreateVariantModal'
 
 export function VariantsList() {
   const { data: variants = [], isLoading } = useVariants()
-  const { data: profile } = useProfile()
+  const { data: profile, isLoading: isProfileLoading } = useProfile()
   const deleteVariant = useDeleteVariant()
   const [showModal, setShowModal] = useState(false)
 
@@ -18,7 +18,8 @@ export function VariantsList() {
         <h1 className="text-xl font-bold text-slate-900 dark:text-white">Resume Variants</h1>
         <button
           onClick={() => setShowModal(true)}
-          className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 text-sm font-medium"
+          disabled={isProfileLoading || !profile}
+          className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 text-sm font-medium disabled:opacity-50 disabled:cursor-not-allowed"
         >
           <Plus className="h-4 w-4" />
           New Variant

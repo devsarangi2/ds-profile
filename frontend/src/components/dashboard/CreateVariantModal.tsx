@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { X, Sparkles, Check, Loader2 } from 'lucide-react'
-import { useCreateVariant, useGenerateVariant, type OverrideSuggestion } from '@/hooks/useVariants'
+import { useCreateVariant, useGenerateVariant, useAddOverride, type OverrideSuggestion } from '@/hooks/useVariants'
 import { useNavigate } from 'react-router-dom'
 
 interface CreateVariantModalProps {
@@ -14,6 +14,7 @@ export function CreateVariantModal({ profileId, onClose }: CreateVariantModalPro
   const navigate = useNavigate()
   const createVariant = useCreateVariant()
   const generateVariant = useGenerateVariant()
+  const addOverride = useAddOverride()
   const [step, setStep] = useState<Step>('form')
   const [form, setForm] = useState({
     name: '',
@@ -54,7 +55,12 @@ export function CreateVariantModal({ profileId, onClose }: CreateVariantModalPro
   }
 
   const handleSave = async () => {
+    if (!profileId) {
+      setError('Profile not loaded yet. Please wait and try again.')
+      return
+    }
     const name = form.name || `variant-${Date.now()}`
+    setError(null)
     try {
       const variant = await createVariant.mutateAsync({
         name,
@@ -63,6 +69,20 @@ export function CreateVariantModal({ profileId, onClose }: CreateVariantModalPro
         target_company: form.target_company,
         target_role: form.target_role,
       })
+      // Persist each accepted suggestion as an override
+      const acceptedSuggestions = suggestions.filter((_, i) => accepted.has(i))
+      await Promise.all(
+        acceptedSuggestions.map(s =>
+          addOverride.mutateAsync({
+            variantId: variant.id,
+            entity_type: s.entity_type,
+            entity_id: s.entity_id,
+            field: s.field,
+            original_value: s.original,
+            overridden_value: s.suggested,
+          })
+        )
+      )
       onClose()
       navigate(`/dashboard/variants/${variant.id}`)
     } catch (err: unknown) {
@@ -90,7 +110,7 @@ export function CreateVariantModal({ profileId, onClose }: CreateVariantModalPro
             {step === 'generating' && 'Generating AI Suggestions...'}
             {step === 'review' && `${suggestions.length} Suggestions`}
           </h2>
-          <button onClick={onClose} className="text-slate-400 hover:text-slate-600">
+          <button onClick={onClose} aria-label="Close" className="text-slate-400 hover:text-slate-600">
             <X className="h-5 w-5" />
           </button>
         </div>
@@ -223,23 +243,28 @@ export function CreateVariantModal({ profileId, onClose }: CreateVariantModalPro
 
         {/* Footer (review step) */}
         {step === 'review' && (
-          <div className="flex items-center justify-between px-6 py-4 border-t border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800/50 shrink-0">
-            <button
-              onClick={() => setStep('form')}
-              className="text-sm text-slate-600 hover:text-slate-900"
-            >
-              Edit
-            </button>
-            <div className="flex gap-3">
-              <button onClick={onClose} className="px-4 py-2 text-sm text-slate-600 border border-slate-300 rounded-lg">Cancel</button>
+          <div className="border-t border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800/50 shrink-0">
+            {error && (
+              <p className="px-6 pt-3 text-sm text-red-500">{error}</p>
+            )}
+            <div className="flex items-center justify-between px-6 py-4">
               <button
-                onClick={handleSave}
-                disabled={createVariant.isPending}
-                className="flex items-center gap-2 px-4 py-2 text-sm bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50"
+                onClick={() => setStep('form')}
+                className="text-sm text-slate-600 hover:text-slate-900"
               >
-                {createVariant.isPending ? <Loader2 className="h-4 w-4 animate-spin" /> : null}
-                Save variant ({accepted.size} override{accepted.size !== 1 ? 's' : ''})
+                Edit
               </button>
+              <div className="flex gap-3">
+                <button onClick={onClose} className="px-4 py-2 text-sm text-slate-600 border border-slate-300 rounded-lg">Cancel</button>
+                <button
+                  onClick={handleSave}
+                  disabled={createVariant.isPending || addOverride.isPending}
+                  className="flex items-center gap-2 px-4 py-2 text-sm bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50"
+                >
+                  {(createVariant.isPending || addOverride.isPending) ? <Loader2 className="h-4 w-4 animate-spin" /> : null}
+                  Save variant ({accepted.size} override{accepted.size !== 1 ? 's' : ''})
+                </button>
+              </div>
             </div>
           </div>
         )}

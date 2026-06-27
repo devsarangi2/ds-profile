@@ -4,7 +4,8 @@ from app.db.base import get_db
 from app.core.auth import get_current_user_id
 from app.schemas.variant import (
     VariantCreate, VariantResponse, VariantDetailResponse,
-    GenerateVariantRequest, GenerateVariantResponse
+    GenerateVariantRequest, GenerateVariantResponse,
+    OverrideCreate, VariantOverrideResponse,
 )
 from app.services import variant_service, settings_service
 
@@ -101,6 +102,35 @@ async def get_variant(
         created_at=v.created_at,
         updated_at=v.updated_at,
         overrides=v.overrides,
+    )
+
+
+@router.post("/{variant_id}/overrides", response_model=VariantOverrideResponse, status_code=201)
+async def add_variant_override(
+    variant_id: str,
+    data: OverrideCreate,
+    user_id: str = Depends(get_current_user_id),
+    db: AsyncSession = Depends(get_db),
+):
+    variant = await variant_service.get_variant(db, variant_id, user_id)
+    if not variant:
+        raise HTTPException(status_code=404, detail="Variant not found")
+    override = await variant_service.add_override(
+        db,
+        variant_id=variant_id,
+        entity_type=data.entity_type,
+        entity_id=data.entity_id,
+        field=data.field,
+        original_value=data.original_value,
+        overridden_value=data.overridden_value,
+    )
+    return VariantOverrideResponse(
+        id=override.id,
+        entity_type=override.entity_type,
+        entity_id=override.entity_id,
+        field=override.field,
+        original_value=override.original_value,
+        overridden_value=override.overridden_value,
     )
 
 

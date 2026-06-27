@@ -83,3 +83,24 @@ export function useGenerateVariant() {
     }) => api.post('/variants/generate', data).then(r => r.data),
   })
 }
+
+export function useAddOverride() {
+  const qc = useQueryClient()
+  return useMutation({
+    mutationFn: (data: {
+      variantId: string
+      entity_type: string
+      entity_id: string
+      field: string
+      original_value?: string
+      overridden_value: string
+    }) => {
+      const { variantId, ...body } = data
+      return api.post(`/variants/${variantId}/overrides`, body).then(r => r.data)
+    },
+    onSuccess: (_data, variables) => {
+      qc.invalidateQueries({ queryKey: ['variant', variables.variantId] })
+      qc.invalidateQueries({ queryKey: ['variants'] })
+    },
+  })
+}
