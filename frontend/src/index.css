@@ -128,3 +128,102 @@
     @apply font-sans;
     }
 }
+
+/* ============================================================
+   DS Profile Design System Tokens
+   All color channels use the "r g b" format so they can be
+   composed with opacity:  rgb(var(--ds-color-primary) / 0.1)
+   ============================================================ */
+
+:root {
+  /* --- Primary (Blue) --- */
+  --ds-color-primary: 37 99 235;          /* blue-600 */
+  --ds-color-primary-hover: 29 78 216;    /* blue-700 */
+  --ds-color-primary-active: 30 64 175;   /* blue-800 */
+  --ds-color-primary-subtle: 239 246 255; /* blue-50 */
+  --ds-color-primary-border: 191 219 254; /* blue-200 */
+
+  /* --- Neutrals (Slate) --- */
+  --ds-color-bg: 255 255 255;
+  --ds-color-surface: 248 250 252;        /* slate-50 */
+  --ds-color-surface-raised: 241 245 249; /* slate-100 */
+  --ds-color-border: 226 232 240;         /* slate-200 */
+  --ds-color-border-strong: 203 213 225;  /* slate-300 */
+  --ds-color-text: 15 23 42;             /* slate-900 */
+  --ds-color-text-muted: 100 116 139;    /* slate-500 */
+  --ds-color-text-subtle: 148 163 184;   /* slate-400 */
+
+  /* --- Semantic --- */
+  --ds-color-success: 22 163 74;
+  --ds-color-success-subtle: 240 253 244;
+  --ds-color-warning: 217 119 6;
+  --ds-color-warning-subtle: 255 251 235;
+  --ds-color-error: 220 38 38;
+  --ds-color-error-subtle: 254 242 242;
+
+  /* --- Radius --- */
+  --ds-radius-sm: 4px;
+  --ds-radius-md: 8px;
+  --ds-radius-lg: 12px;
+  --ds-radius-xl: 16px;
+  --ds-radius-full: 9999px;
+
+  /* --- Motion --- */
+  --ds-duration-fast: 100ms;
+  --ds-duration-base: 150ms;
+  --ds-duration-slow: 200ms;
+  --ds-duration-slower: 250ms;
+  --ds-ease-default: ease;
+  --ds-ease-enter: ease-out;
+  --ds-ease-exit: ease-in;
+}
+
+/* Dark mode token overrides */
+.dark {
+  --ds-color-bg: 10 15 28;
+  --ds-color-surface: 17 24 39;
+  --ds-color-surface-raised: 31 41 55;
+  --ds-color-border: 55 65 81;
+  --ds-color-border-strong: 75 85 99;
+  --ds-color-text: 248 250 252;
+  --ds-color-text-muted: 148 163 184;
+  --ds-color-text-subtle: 100 116 139;
+  --ds-color-primary-subtle: 23 37 84;
+  --ds-color-primary-border: 30 58 138;
+  --ds-color-success-subtle: 20 83 45;
+  --ds-color-warning-subtle: 120 53 15;
+  --ds-color-error-subtle: 127 29 29;
+}
+
+/* Smooth theme transitions */
+html {
+  transition:
+    background-color var(--ds-duration-base) var(--ds-ease-default),
+    color var(--ds-duration-base) var(--ds-ease-default);
+}
+
+/* Skeleton shimmer animation */
+@keyframes ds-shimmer {
+  from { background-position: -200% 0; }
+  to   { background-position:  200% 0; }
+}
+
+.ds-skeleton {
+  background: linear-gradient(
+    90deg,
+    rgb(var(--ds-color-surface)) 25%,
+    rgb(var(--ds-color-surface-raised)) 50%,
+    rgb(var(--ds-color-surface)) 75%
+  );
+  background-size: 200% 100%;
+  animation: ds-shimmer 1.5s infinite;
+  border-radius: var(--ds-radius-sm);
+}
+
+/* Respect reduced motion */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    transition-duration: 0.01ms !important;
+    animation-duration: 0.01ms !important;
+  }
+}
