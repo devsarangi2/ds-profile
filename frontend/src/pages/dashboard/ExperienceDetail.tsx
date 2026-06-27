@@ -2,6 +2,7 @@ import { useParams, useNavigate, Link } from 'react-router-dom'
 import { ArrowLeft, Calendar, Trash2 } from 'lucide-react'
 import { Badge } from '@/components/ui/badge'
 import { InlineEdit } from '@/components/ui/InlineEdit'
+import { ImproveButton } from '@/components/ai/ImproveButton'
 import { useQuery } from '@tanstack/react-query'
 import { useUpdateEmployment, useDeleteEmployment } from '@/hooks/useEmploymentMutations'
 import { api } from '@/lib/api'
@@ -124,6 +125,15 @@ export function ExperienceDetail() {
             placeholder="Add a description of this role..."
             testId="inline-edit-description"
           />
+          <div className="px-3">
+            <ImproveButton
+              text={job.description ?? ''}
+              context={`${job.job_title} at ${job.company}`}
+              onAccept={async (suggestion) => {
+                await updateEmployment.mutateAsync({ description: suggestion })
+              }}
+            />
+          </div>
         </div>
       </div>
 

@@ -3,6 +3,7 @@ import { useParams, useNavigate, Link } from 'react-router-dom'
 import { ArrowLeft, X, Plus, Trash2 } from 'lucide-react'
 import { Badge } from '@/components/ui/badge'
 import { InlineEdit } from '@/components/ui/InlineEdit'
+import { ImproveButton } from '@/components/ai/ImproveButton'
 import { useSingleProject, useUpdateProject, useDeleteProject, useAddRole, useRemoveRole } from '@/hooks/useProjectMutations'
 import type { Project } from '@/hooks/useProfile'
 
@@ -83,12 +84,30 @@ export function ProjectDetail() {
         <div>
           <label className="block text-xs font-medium text-slate-400 uppercase tracking-wide mb-1">Description</label>
           <InlineEdit value={project.description ?? ''} onSave={handleSaveField('description')} multiline placeholder="Add a description..." />
+          <div className="px-3">
+            <ImproveButton
+              text={project.description ?? ''}
+              context={`Project: ${project.name}`}
+              onAccept={async (suggestion) => {
+                await updateProject.mutateAsync({ description: suggestion })
+              }}
+            />
+          </div>
         </div>
 
         {/* Impact */}
         <div>
           <label className="block text-xs font-medium text-slate-400 uppercase tracking-wide mb-1">Impact</label>
           <InlineEdit value={project.impact ?? ''} onSave={handleSaveField('impact')} multiline placeholder="e.g. Reduced deployment time by 40%..." />
+          <div className="px-3">
+            <ImproveButton
+              text={project.impact ?? ''}
+              context={`Impact for project: ${project.name}`}
+              onAccept={async (suggestion) => {
+                await updateProject.mutateAsync({ impact: suggestion })
+              }}
+            />
+          </div>
         </div>
 
         {/* Roles */}
