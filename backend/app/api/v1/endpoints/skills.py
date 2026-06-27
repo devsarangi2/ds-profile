@@ -5,7 +5,7 @@ from app.db.base import get_db
 from app.core.auth import get_current_user_id
 from app.models.skill import Skill
 from app.schemas.skill import SkillCreate, SkillUpdate, SkillResponse
-from app.services import skill_service
+from app.services import skill_service, project_service, employment_service
 
 skills_router = APIRouter(prefix="/skills", tags=["skills"])
 project_skills_router = APIRouter(prefix="/projects", tags=["skills"])
@@ -63,6 +63,9 @@ async def associate_skill_with_project(
     user_id: str = Depends(get_current_user_id),
     db: AsyncSession = Depends(get_db),
 ):
+    project = await project_service.get_project(db, project_id, user_id)
+    if not project:
+        raise HTTPException(status_code=404, detail="Project not found")
     await skill_service.associate_with_project(db, project_id, skill_id)
 
 
@@ -73,6 +76,9 @@ async def remove_skill_from_project(
     user_id: str = Depends(get_current_user_id),
     db: AsyncSession = Depends(get_db),
 ):
+    project = await project_service.get_project(db, project_id, user_id)
+    if not project:
+        raise HTTPException(status_code=404, detail="Project not found")
     await skill_service.remove_from_project(db, project_id, skill_id)
 
 
@@ -83,6 +89,9 @@ async def associate_skill_with_employment(
     user_id: str = Depends(get_current_user_id),
     db: AsyncSession = Depends(get_db),
 ):
+    employment = await employment_service.get_employment(db, employment_id, user_id)
+    if not employment:
+        raise HTTPException(status_code=404, detail="Employment not found")
     await skill_service.associate_with_employment(db, employment_id, skill_id)
 
 
@@ -93,4 +102,7 @@ async def remove_skill_from_employment(
     user_id: str = Depends(get_current_user_id),
     db: AsyncSession = Depends(get_db),
 ):
+    employment = await employment_service.get_employment(db, employment_id, user_id)
+    if not employment:
+        raise HTTPException(status_code=404, detail="Employment not found")
     await skill_service.remove_from_employment(db, employment_id, skill_id)
