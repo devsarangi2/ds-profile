@@ -1,16 +1,68 @@
-# docker-compose.yml — ds-profile (production preview)
-# Serves built static site via Nginx on port 14322
-# Usage: make preview
+version: "3.9"
 
 services:
-  dsp-site:
-    image: dsp-site:latest
-    container_name: dsp-site
+  db:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_DB: dsprofile
+      POSTGRES_USER: dsprofile
+      POSTGRES_PASSWORD: dsprofile
     ports:
-      - "${PREVIEW_PORT:-14322}:80"
-    restart: unless-stopped
+      - "5432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
     healthcheck:
-      test: ["CMD-SHELL", "wget -qO- http://localhost:80/ || exit 1"]
-      interval: 10s
+      test: ["CMD-SHELL", "pg_isready -U dsprofile"]
+      interval: 5s
       timeout: 5s
-      retries: 3
+      retries: 5
+
+  storage:
+    image: minio/minio:latest
+    command: server /data --console-address ":9001"
+    environment:
+      MINIO_ROOT_USER: minioadmin
+      MINIO_ROOT_PASSWORD: minioadmin
+    ports:
+      - "9000:9000"
+      - "9001:9001"
+    volumes:
+      - miniodata:/data
+    healthcheck:
+      test: ["CMD", "mc", "ready", "local"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  parser:
+    image: downloads.unstructured.io/unstructured-io/unstructured-api:latest
+    ports:
+      - "8001:8000"
+
+  api:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    env_file: .env
+    ports:
+      - "8000:8000"
+    depends_on:
+      db:
+        condition: service_healthy
+      storage:
+        condition: service_started
+      parser:
+        condition: service_started
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    ports:
+      - "3000:80"
+    depends_on:
+      - api
+
+volumes:
+  pgdata:
+  miniodata:
