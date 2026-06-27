@@ -36,7 +36,7 @@ export function PublicProfile() {
 
   if (!profile) {
     return (
-      <div className="max-w-4xl mx-auto px-4 py-16 text-center text-slate-500">
+      <div data-testid="public-profile" className="max-w-4xl mx-auto px-4 py-16 text-center text-slate-500">
         <p>Profile not found.</p>
       </div>
     )
@@ -46,7 +46,7 @@ export function PublicProfile() {
   const recentJobs = employment.slice(0, 3)
 
   return (
-    <div className="max-w-4xl mx-auto px-4 pb-16">
+    <div data-testid="public-profile" className="max-w-4xl mx-auto px-4 pb-16">
       {/* Cover + Avatar */}
       <div className="relative mb-16">
         <div
