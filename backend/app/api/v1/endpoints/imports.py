@@ -21,7 +21,7 @@ async def import_pdf(
     user_id: str = Depends(get_current_user_id),
     db: AsyncSession = Depends(get_db),
 ):
-    if file.content_type not in ("application/pdf", "application/octet-stream"):
+    if file.content_type != "application/pdf":
         raise HTTPException(status_code=400, detail="Only PDF files allowed")
 
     contents = await file.read()

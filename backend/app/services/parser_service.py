@@ -1,8 +1,18 @@
+import os
+import re
 import httpx
 from app.core.config import settings
 
 
+def _safe_filename(filename: str) -> str:
+    """Strip path components and non-alphanumeric characters to prevent path traversal."""
+    base = os.path.basename(filename)
+    safe = re.sub(r"[^\w\-. ]", "_", base)
+    return safe or "document.pdf"
+
+
 async def parse_pdf(file_bytes: bytes, filename: str) -> list[dict]:
+    filename = _safe_filename(filename)
     if settings.unstructured_backend == "local":
         return await _parse_via_local(file_bytes, filename)
     return await _parse_via_cloud(file_bytes, filename)

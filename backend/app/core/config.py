@@ -9,7 +9,7 @@ class Settings(BaseSettings):
     )
 
     database_url: str = "postgresql+asyncpg://dsprofile:dsprofile@localhost:5432/dsprofile"
-    auth_disabled: bool = True
+    auth_disabled: bool = False  # Must be set to true explicitly in .env for dev; defaults safe for prod
     storage_backend: str = "minio"
     storage_endpoint: str = "http://localhost:9000"
     storage_access_key: str = "minioadmin"
