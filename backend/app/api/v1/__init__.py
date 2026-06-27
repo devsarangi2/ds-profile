@@ -1,5 +1,5 @@
 from fastapi import APIRouter
-from app.api.v1.endpoints import profiles, employment, projects, certifications, uploads
+from app.api.v1.endpoints import profiles, employment, projects, certifications, uploads, ai, settings
 from app.api.v1.endpoints.skills import skills_router, project_skills_router, employment_skills_router
 
 router = APIRouter()
@@ -11,3 +11,5 @@ router.include_router(project_skills_router)
 router.include_router(employment_skills_router)
 router.include_router(certifications.router)
 router.include_router(uploads.router)
+router.include_router(ai.router)
+router.include_router(settings.router)
