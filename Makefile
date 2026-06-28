@@ -1,114 +1,145 @@
-# Makefile — ds-profile
-# Personal portfolio static site (Astro + Tailwind → GitHub Pages)
-#
-# Ports:
-#   Dev (local npm):       http://localhost:4321
-#   Dev (Docker):          http://localhost:14321
-#   Preview (Nginx/prod):  http://localhost:14322
 SHELL := /bin/bash
+.DEFAULT_GOAL := help
 
-IMAGE_NAME  := dsp-site
-DEV_PORT    := 14321
-PREVIEW_PORT := 14322
+# Port reference (project-specific, avoid collisions with other dsapps projects)
+FRONTEND_PORT     := 13000
+FRONTEND_DEV_PORT := 15173
+BACKEND_PORT      := 18000
+DB_PORT           := 15432
+STORAGE_PORT      := 19000
+STORAGE_CONSOLE   := 19001
+PARSER_PORT       := 18001
 
-.PHONY: help install dev dev-docker preview stop build build-local \
-        clean lint status logs open
+COMPOSE_BASE := docker compose -f infrastructure/docker-compose.yml
+COMPOSE_DEV  := $(COMPOSE_BASE) -f infrastructure/docker-compose.dev.yml
+COMPOSE_PROD := $(COMPOSE_BASE) -f infrastructure/docker-compose.prod.yml
+
+.PHONY: help install dev dev-local stop build clean clean-all test lint status logs \
+        open open-api open-storage restart
 
 # ─── Help ─────────────────────────────────────────────────────────────────────
 
 help:
 	@echo ""
-	@echo "ds-profile — Make targets"
-	@echo "══════════════════════════════════════════════════"
+	@echo "ds-profile — Development Commands"
+	@echo "══════════════════════════════════════════════════════════════"
 	@echo ""
-	@echo "Development:"
-	@echo "  install       Install npm dependencies"
-	@echo "  dev           Start Astro dev server locally (port 4321)"
-	@echo "  dev-docker    Start Astro dev server in Docker (port $(DEV_PORT))"
-	@echo "  open          Open dev server in browser"
+	@echo "Getting started:"
+	@echo "  install       Install all dependencies (frontend + backend)"
+	@echo "  dev           Start full stack in Docker (hot reload)"
+	@echo "  dev-local     Start backend + frontend locally (no Docker)"
+	@echo "  stop          Stop all Docker services"
 	@echo ""
-	@echo "Production preview:"
-	@echo "  build         Build production Docker image (Nginx)"
-	@echo "  build-local   Build static site locally (dist/)"
-	@echo "  preview       Build + serve production bundle in Docker (port $(PREVIEW_PORT))"
-	@echo "  stop          Stop all Docker containers + free ports"
+	@echo "Build & Test:"
+	@echo "  build         Build production Docker images"
+	@echo "  test          Run all tests (frontend + backend)"
+	@echo "  lint          Run all linters"
 	@echo ""
-	@echo "Maintenance:"
-	@echo "  lint          Run astro check (TypeScript + type validation)"
-	@echo "  clean         Remove dist/, .astro/, node_modules"
-	@echo "  status        Show container statuses"
-	@echo "  logs          Tail Docker container logs"
+	@echo "Ops:"
+	@echo "  status        Show service health"
+	@echo "  logs          Tail all service logs"
+	@echo "  restart       Stop + start dev services"
+	@echo "  clean         Remove build artifacts"
+	@echo "  clean-all     Remove everything including Docker volumes"
+	@echo ""
+	@echo "Open in browser:"
+	@echo "  open          Open frontend (dev)  → http://localhost:$(FRONTEND_DEV_PORT)"
+	@echo "  open-api      Open API docs        → http://localhost:$(BACKEND_PORT)/docs"
+	@echo "  open-storage  Open MinIO console   → http://localhost:$(STORAGE_CONSOLE)"
+	@echo ""
+	@echo "Service Ports:"
+	@echo "  Frontend (dev):     http://localhost:$(FRONTEND_DEV_PORT)"
+	@echo "  Frontend (prod):    http://localhost:$(FRONTEND_PORT)"
+	@echo "  Backend API:        http://localhost:$(BACKEND_PORT)"
+	@echo "  API Docs:           http://localhost:$(BACKEND_PORT)/docs"
+	@echo "  PostgreSQL:         localhost:$(DB_PORT)"
+	@echo "  MinIO API:          http://localhost:$(STORAGE_PORT)"
+	@echo "  MinIO Console:      http://localhost:$(STORAGE_CONSOLE)"
+	@echo "  Parser:             http://localhost:$(PARSER_PORT)"
 	@echo ""
 
 # ─── Install ──────────────────────────────────────────────────────────────────
 
 install:
-	npm install
+	$(MAKE) -C frontend install
+	$(MAKE) -C backend install
 
-# ─── Development ──────────────────────────────────────────────────────────────
+# ─── Dev (Docker) ─────────────────────────────────────────────────────────────
 
-dev: _free-dev-port
-	npm run dev
+dev:
+	$(COMPOSE_DEV) up --build -d
+	@echo ""
+	@echo "Services started:"
+	@echo "  Frontend (dev):  http://localhost:$(FRONTEND_DEV_PORT)"
+	@echo "  Backend API:     http://localhost:$(BACKEND_PORT)"
+	@echo "  API Docs:        http://localhost:$(BACKEND_PORT)/docs"
+	@echo ""
+	@echo "Run 'make logs' to tail logs, 'make stop' to shut down."
 
-dev-docker: stop
-	docker compose -f docker-compose.yml -f docker-compose.dev.yml up --build --watch
+# ─── Dev (Local — no Docker) ──────────────────────────────────────────────────
 
-open:
-	@open http://localhost:4321 2>/dev/null || xdg-open http://localhost:4321 2>/dev/null || true
+dev-local:
+	@echo "Starting backend and frontend locally..."
+	@$(MAKE) -C backend dev &
+	@$(MAKE) -C frontend dev
 
-# ─── Production Preview ───────────────────────────────────────────────────────
+# ─── Build ────────────────────────────────────────────────────────────────────
 
 build:
-	docker build -t $(IMAGE_NAME):latest .
+	$(COMPOSE_PROD) build
 
-build-local:
-	npm run build
+# ─── Stop ─────────────────────────────────────────────────────────────────────
 
-preview: stop build
-	docker compose -f docker-compose.yml up -d
-	@echo ""
-	@echo "Preview running at http://localhost:$(PREVIEW_PORT)"
-	@echo "Run 'make stop' to shut it down."
+stop:
+	$(MAKE) -C infrastructure stop
 
-# ─── Stop / Port Management ───────────────────────────────────────────────────
+# ─── Restart ──────────────────────────────────────────────────────────────────
 
-stop: _free-preview-port _free-dev-docker-port
-	-docker compose -f docker-compose.yml -f docker-compose.dev.yml down --remove-orphans 2>/dev/null || true
-	-docker compose -f docker-compose.yml down --remove-orphans 2>/dev/null || true
+restart: stop dev
 
-_free-dev-port:
-	@pid=$$(lsof -ti :4321 2>/dev/null); \
-	if [ -n "$$pid" ]; then \
-		echo "Killing process on port 4321 (pid $$pid)..."; \
-		kill -9 $$pid 2>/dev/null || true; \
-	fi
+# ─── Test ─────────────────────────────────────────────────────────────────────
 
-_free-dev-docker-port:
-	@pid=$$(lsof -ti :$(DEV_PORT) 2>/dev/null); \
-	if [ -n "$$pid" ]; then \
-		echo "Killing process on port $(DEV_PORT) (pid $$pid)..."; \
-		kill -9 $$pid 2>/dev/null || true; \
-	fi
+test:
+	$(MAKE) -C backend test
+	$(MAKE) -C frontend test
 
-_free-preview-port:
-	@pid=$$(lsof -ti :$(PREVIEW_PORT) 2>/dev/null); \
-	if [ -n "$$pid" ]; then \
-		echo "Killing process on port $(PREVIEW_PORT) (pid $$pid)..."; \
-		kill -9 $$pid 2>/dev/null || true; \
-	fi
-
-# ─── Maintenance ──────────────────────────────────────────────────────────────
+# ─── Lint ─────────────────────────────────────────────────────────────────────
 
 lint:
-	npx astro check
+	$(MAKE) -C backend lint
+	$(MAKE) -C frontend lint
 
-clean: stop
-	rm -rf dist/ .astro/ node_modules/
-	docker rmi $(IMAGE_NAME):latest $(IMAGE_NAME):dev 2>/dev/null || true
+# ─── Status ───────────────────────────────────────────────────────────────────
 
 status:
 	@./status.sh
 
+# ─── Logs ─────────────────────────────────────────────────────────────────────
+
 logs:
-	-docker compose -f docker-compose.yml -f docker-compose.dev.yml logs -f 2>/dev/null || \
-	 docker compose -f docker-compose.yml logs -f 2>/dev/null || true
+	$(COMPOSE_DEV) logs -f
+
+# ─── Open in Browser ──────────────────────────────────────────────────────────
+
+open:
+	@open http://localhost:$(FRONTEND_DEV_PORT) 2>/dev/null || \
+	 xdg-open http://localhost:$(FRONTEND_DEV_PORT) 2>/dev/null || true
+
+open-api:
+	@open http://localhost:$(BACKEND_PORT)/docs 2>/dev/null || \
+	 xdg-open http://localhost:$(BACKEND_PORT)/docs 2>/dev/null || true
+
+open-storage:
+	@open http://localhost:$(STORAGE_CONSOLE) 2>/dev/null || \
+	 xdg-open http://localhost:$(STORAGE_CONSOLE) 2>/dev/null || true
+
+# ─── Clean ────────────────────────────────────────────────────────────────────
+
+clean:
+	$(MAKE) -C frontend clean
+	$(MAKE) -C backend clean
+
+clean-all: stop
+	$(MAKE) -C infrastructure clean
+	$(MAKE) -C frontend clean
+	$(MAKE) -C backend clean

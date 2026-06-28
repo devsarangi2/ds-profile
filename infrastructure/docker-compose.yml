@@ -1,0 +1,86 @@
+# Base docker-compose — shared across all environments
+# Project: ds-profile (dsp)
+# Run from: project root via `docker compose -f infrastructure/docker-compose.yml ...`
+
+services:
+  db:
+    image: postgres:16-alpine
+    container_name: dsp-db
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB:-dsprofile}
+      POSTGRES_USER: ${POSTGRES_USER:-dsprofile}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-dsprofile}
+    ports:
+      - "${DB_PORT:-15432}:5432"
+    volumes:
+      - dsp_pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-dsprofile}"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  storage:
+    image: minio/minio:latest
+    container_name: dsp-storage
+    command: server /data --console-address ":9001"
+    environment:
+      MINIO_ROOT_USER: ${STORAGE_ACCESS_KEY:-minioadmin}
+      MINIO_ROOT_PASSWORD: ${STORAGE_SECRET_KEY:-minioadmin}
+    ports:
+      - "${STORAGE_PORT:-19000}:9000"
+      - "${STORAGE_CONSOLE_PORT:-19001}:9001"
+    volumes:
+      - dsp_miniodata:/data
+    healthcheck:
+      test: ["CMD-SHELL", "curl -f http://localhost:9000/minio/health/live || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  parser:
+    image: downloads.unstructured.io/unstructured-io/unstructured-api:latest
+    container_name: dsp-parser
+    ports:
+      - "${PARSER_PORT:-18001}:8000"
+    healthcheck:
+      test: ["CMD-SHELL", "curl -f http://localhost:8000/healthcheck || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  api:
+    build:
+      context: ../backend
+      dockerfile: Dockerfile
+    container_name: dsp-api
+    env_file: ../.env
+    ports:
+      - "${BACKEND_PORT:-18000}:8000"
+    depends_on:
+      db:
+        condition: service_healthy
+      storage:
+        condition: service_started
+      parser:
+        condition: service_started
+    healthcheck:
+      test: ["CMD-SHELL", "curl -f http://localhost:8000/health || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  frontend:
+    build:
+      context: ../frontend
+      dockerfile: Dockerfile
+    container_name: dsp-frontend
+    ports:
+      - "${FRONTEND_PORT:-13000}:80"
+    depends_on:
+      api:
+        condition: service_healthy
+
+volumes:
+  dsp_pgdata:
+  dsp_miniodata:
