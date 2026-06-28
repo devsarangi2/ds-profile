@@ -1,0 +1,73 @@
+---
+title: "Architecture"
+description: "How ds-profile is built"
+---
+
+## Overview
+
+ds-profile is a full-stack profile management application with two modes:
+
+- **Private dashboard** (`/dashboard/*`) — authenticated, full CRUD, inline editing, AI tools
+- **Public profile** (`/`) — read-only, no auth required
+
+```
+Browser
+  ├── Public Profile  →  FastAPI  →  PostgreSQL
+  └── Dashboard       →  FastAPI  →  PostgreSQL
+                              ├── MinIO (images, files)
+                              ├── Unstructured.io (PDF parsing)
+                              └── LiteLLM (AI routing)
+```
+
+## Tech Stack
+
+| Layer | Technology |
+|---|---|
+| Frontend | Vite + React 19 + TypeScript + Tailwind v4 + shadcn/ui |
+| Backend | FastAPI + SQLAlchemy 2.0 (async) + Alembic |
+| AI | LiteLLM (routes to LM Studio / OpenRouter / Anthropic / Gemini) |
+| PDF Parsing | Unstructured.io (self-hosted Docker in dev, Cloud API in prod) |
+| Database | PostgreSQL 16 |
+| File Storage | MinIO (dev) / Supabase Storage (prod) |
+| Auth | Disabled in dev / Supabase JWT in prod |
+| Testing | pytest (backend) + Playwright (frontend E2E) |
+
+## Data Model
+
+### Hierarchy
+
+```
+Profile (user's profile)
+  └── Employment (Principal Consultant @ Accenture — full-time)
+        └── Project A
+              ├── Role: Solution Architect   (freeform)
+              └── Role: Team Lead
+        └── Project B
+              └── Role: Enterprise Architect
+
+Employment (type: personal)
+  └── My SaaS App
+        └── Role: Founder
+
+Variants (resume variants)
+  └── master (base=true)
+  └── principal-consultant-accenture (overrides: description, impact)
+```
+
+## AI Integration
+
+LiteLLM routes requests to configured providers. Settings are loaded from the database on **every request** — never cached. This allows changing providers without restarting the server.
+
+Supported providers:
+- **LM Studio** (default for dev, free, local GPU) — `http://100.82.183.76:8080/v1`
+- **OpenRouter** — access to Claude, GPT-4, Gemini etc.
+- **Anthropic** — direct Claude API
+- **Google Gemini** — direct Gemini API
+
+## Security
+
+- SQL injection: all queries via SQLAlchemy ORM (no raw SQL)
+- File uploads: MIME type validation + size limits (5MB images, 20MB PDFs)
+- Auth: `AUTH_DISABLED` defaults to `false` (must explicitly enable for dev)
+- API keys: stored server-side, never returned in API responses (`has_api_key: bool` only)
+- CORS: restricted to localhost origins in dev

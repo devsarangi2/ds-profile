@@ -1,0 +1,50 @@
+# Dev overrides — hot reload, bind mounts, watch mode
+# Usage: docker compose -f infrastructure/docker-compose.yml -f infrastructure/docker-compose.dev.yml up
+
+services:
+  db:
+    environment:
+      POSTGRES_DB: dsprofile_dev
+      POSTGRES_USER: dsprofile
+      POSTGRES_PASSWORD: dsprofile
+
+  api:
+    build:
+      context: ../backend
+      dockerfile: Dockerfile.dev
+    command: uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload
+    volumes:
+      - ../backend:/app
+      - /app/.venv
+    environment:
+      - ENVIRONMENT=development
+      - WATCHFILES_FORCE_POLLING=true
+    develop:
+      watch:
+        - action: sync
+          path: ../backend/app
+          target: /app/app
+        - action: rebuild
+          path: ../backend/requirements.txt
+
+  frontend:
+    build:
+      context: ../frontend
+      dockerfile: Dockerfile.dev
+    container_name: dsp-frontend-dev
+    command: npm run dev -- --host
+    ports:
+      - "${FRONTEND_DEV_PORT:-15173}:5173"
+    volumes:
+      - ../frontend:/app
+      - /app/node_modules
+    environment:
+      - NODE_ENV=development
+      - WATCHPACK_POLLING=true
+    develop:
+      watch:
+        - action: sync
+          path: ../frontend/src
+          target: /app/src
+        - action: rebuild
+          path: ../frontend/package.json

@@ -12,10 +12,33 @@ yarn-debug.log*
 yarn-error.log*
 pnpm-debug.log*
 
-
-# environment variables
+# Environment
 .env
+.env.local
+.env.*.local
 .env.production
+
+# Encrypted secrets
+*.enc
+
+# Defect logs
+defects/*.log
+
+# Python
+backend/.venv/
+backend/__pycache__/
+backend/**/__pycache__/
+**/*.pyc
+backend/.pytest_cache/
+backend/htmlcov/
+backend/.coverage
+
+# Frontend build
+frontend/dist/
+frontend/node_modules/
+
+# Docker
+*.log
 
 # macOS-specific files
 .DS_Store

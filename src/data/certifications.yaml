@@ -1,5 +1,0 @@
-- name: "Certification Name"
-  issuer: "Issuing Organization"
-  date: "Jun 2024"
-  badge: "/images/certs/placeholder.png"
-  url: "https://example.com/verify"

@@ -1,0 +1,58 @@
+---
+title: "Employment API"
+description: "Manage employment history"
+---
+
+## Endpoints
+
+### GET /api/v1/employment
+
+Returns all employment records for the current user.
+
+**Response** `200 OK`
+```json
+[
+  {
+    "id": "uuid",
+    "profile_id": "uuid",
+    "company": "Accenture",
+    "title": "Principal Consultant",
+    "employment_type": "full_time",
+    "start_date": "2020-01-01",
+    "end_date": null,
+    "is_current": true,
+    "description": "...",
+    "location": "Sydney, AU",
+    "created_at": "2026-06-27T00:00:00",
+    "updated_at": "2026-06-27T00:00:00"
+  }
+]
+```
+
+### POST /api/v1/employment
+
+Create a new employment record.
+
+**Body**
+```json
+{
+  "company": "Accenture",
+  "title": "Principal Consultant",
+  "employment_type": "full_time",
+  "start_date": "2020-01-01",
+  "is_current": true,
+  "location": "Sydney, AU"
+}
+```
+
+### GET /api/v1/employment/{id}
+
+Get a single employment record with its projects.
+
+### PATCH /api/v1/employment/{id}
+
+Update employment fields. All fields optional.
+
+### DELETE /api/v1/employment/{id}
+
+Delete employment record and all associated projects.

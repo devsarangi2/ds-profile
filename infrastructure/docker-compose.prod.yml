@@ -1,0 +1,38 @@
+# Prod overrides — restart policies, resource limits, no bind mounts
+# Usage: docker compose -f infrastructure/docker-compose.yml -f infrastructure/docker-compose.prod.yml up -d
+
+services:
+  db:
+    restart: unless-stopped
+    deploy:
+      resources:
+        limits:
+          memory: 512M
+
+  storage:
+    restart: unless-stopped
+    deploy:
+      resources:
+        limits:
+          memory: 256M
+
+  parser:
+    restart: unless-stopped
+    deploy:
+      resources:
+        limits:
+          memory: 2G
+
+  api:
+    restart: unless-stopped
+    deploy:
+      resources:
+        limits:
+          memory: 1G
+
+  frontend:
+    restart: unless-stopped
+    deploy:
+      resources:
+        limits:
+          memory: 256M

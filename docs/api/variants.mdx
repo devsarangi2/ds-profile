@@ -1,0 +1,65 @@
+---
+title: "Variants API"
+description: "Manage resume variants"
+---
+
+## Overview
+
+Variants store delta overrides on top of the master profile. When rendered, the master record is merged with overrides at read time.
+
+## Endpoints
+
+### GET /api/v1/variants
+
+Returns all variants for the current user.
+
+**Response** `200 OK`
+```json
+[
+  {
+    "id": "uuid",
+    "profile_id": "uuid",
+    "name": "principal-consultant-accenture",
+    "label": "Principal Consultant @ Accenture",
+    "is_base": false,
+    "overrides": {
+      "employment": {
+        "uuid": {
+          "description": "Overridden description..."
+        }
+      }
+    },
+    "created_at": "2026-06-27T00:00:00",
+    "updated_at": "2026-06-27T00:00:00"
+  }
+]
+```
+
+### POST /api/v1/variants
+
+Create a new variant.
+
+**Body**
+```json
+{
+  "name": "principal-consultant-accenture",
+  "label": "Principal Consultant @ Accenture",
+  "job_description": "We are looking for a Principal Consultant...",
+  "company": "Accenture",
+  "role": "Principal Consultant"
+}
+```
+
+The `job_description`, `company`, and `role` fields trigger AI-assisted generation of overrides.
+
+### GET /api/v1/variants/{id}
+
+Get a single variant with its resolved (merged) profile.
+
+### PATCH /api/v1/variants/{id}
+
+Update variant fields or overrides manually.
+
+### DELETE /api/v1/variants/{id}
+
+Delete a variant (cannot delete the base variant).

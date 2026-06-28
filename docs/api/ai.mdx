@@ -1,0 +1,83 @@
+---
+title: "AI API"
+description: "AI-powered improvement and extraction endpoints"
+---
+
+## Endpoints
+
+### POST /api/v1/ai/improve
+
+Improve a text field using AI.
+
+**Body**
+```json
+{
+  "field_type": "description",
+  "current_text": "Led a team building a data platform.",
+  "context": {
+    "company": "Accenture",
+    "role": "Principal Consultant"
+  }
+}
+```
+
+**Response** `200 OK`
+```json
+{
+  "suggestion": "Architected and delivered an enterprise data platform serving 500+ analysts across 12 business units, reducing time-to-insight from 3 days to 4 hours."
+}
+```
+
+### POST /api/v1/ai/extract-pdf
+
+Extract structured profile data from raw text (output of PDF parsing).
+
+**Body**
+```json
+{
+  "raw_text": "Dev Sarangi\nPrincipal Consultant at Accenture..."
+}
+```
+
+**Response** `200 OK`
+```json
+{
+  "name": "Dev Sarangi",
+  "headline": "Principal Consultant",
+  "employment": [...],
+  "skills": [...]
+}
+```
+
+### POST /api/v1/ai/generate-variant
+
+Generate variant overrides for a job description.
+
+**Body**
+```json
+{
+  "job_description": "We are looking for a Principal Consultant...",
+  "company": "Accenture",
+  "role": "Principal Consultant"
+}
+```
+
+**Response** `200 OK`
+```json
+{
+  "overrides": {
+    "employment": {
+      "uuid": {
+        "description": "Tailored description for this role..."
+      }
+    }
+  },
+  "suggestions": [
+    {
+      "field": "employment.uuid.description",
+      "original": "...",
+      "suggested": "..."
+    }
+  ]
+}
+```

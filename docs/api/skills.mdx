@@ -1,0 +1,72 @@
+---
+title: "Skills API"
+description: "Manage skills and certifications"
+---
+
+## Endpoints
+
+### GET /api/v1/skills
+
+Returns all skills for the current user.
+
+**Response** `200 OK`
+```json
+[
+  {
+    "id": "uuid",
+    "profile_id": "uuid",
+    "name": "Python",
+    "category": "Programming Languages",
+    "proficiency": "expert",
+    "years_experience": 8,
+    "created_at": "2026-06-27T00:00:00"
+  }
+]
+```
+
+### POST /api/v1/skills
+
+Create a new skill.
+
+**Body**
+```json
+{
+  "name": "Python",
+  "category": "Programming Languages",
+  "proficiency": "expert",
+  "years_experience": 8
+}
+```
+
+### PATCH /api/v1/skills/{id}
+
+Update skill fields.
+
+### DELETE /api/v1/skills/{id}
+
+Delete a skill.
+
+## Certifications
+
+### GET /api/v1/certifications
+
+Returns all certifications for the current user.
+
+### POST /api/v1/certifications
+
+Create a new certification.
+
+**Body**
+```json
+{
+  "name": "AWS Solutions Architect",
+  "issuer": "Amazon Web Services",
+  "issue_date": "2023-01-15",
+  "expiry_date": "2026-01-15",
+  "credential_url": "https://..."
+}
+```
+
+### DELETE /api/v1/certifications/{id}
+
+Delete a certification.

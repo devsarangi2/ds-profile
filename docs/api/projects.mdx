@@ -1,0 +1,56 @@
+---
+title: "Projects API"
+description: "Manage projects within employment records"
+---
+
+## Endpoints
+
+### GET /api/v1/employment/{employment_id}/projects
+
+Returns all projects under a given employment record.
+
+**Response** `200 OK`
+```json
+[
+  {
+    "id": "uuid",
+    "employment_id": "uuid",
+    "name": "Enterprise Data Platform",
+    "description": "...",
+    "start_date": "2021-03-01",
+    "end_date": "2022-06-01",
+    "tech_stack": ["Python", "AWS", "Snowflake"],
+    "impact": "...",
+    "roles": ["Solution Architect", "Team Lead"],
+    "created_at": "2026-06-27T00:00:00",
+    "updated_at": "2026-06-27T00:00:00"
+  }
+]
+```
+
+### POST /api/v1/employment/{employment_id}/projects
+
+Create a new project under an employment record.
+
+**Body**
+```json
+{
+  "name": "Enterprise Data Platform",
+  "description": "...",
+  "start_date": "2021-03-01",
+  "tech_stack": ["Python", "AWS", "Snowflake"],
+  "roles": ["Solution Architect"]
+}
+```
+
+### GET /api/v1/projects/{id}
+
+Get a single project by ID.
+
+### PATCH /api/v1/projects/{id}
+
+Update project fields. All fields optional.
+
+### DELETE /api/v1/projects/{id}
+
+Delete a project.

@@ -1,0 +1,17 @@
+---
+title: "Resume Variants"
+description: "AI-tailored resume variants for specific job applications"
+---
+
+Variants are tailored versions of your master profile, stored as delta overrides.
+
+## How it works
+
+1. Click **New Variant** → paste job description + company/role
+2. AI reads JD + your master profile → suggests improvements to descriptions and impact statements
+3. Review each suggestion (side-by-side diff) → accept or reject
+4. Saved as a named variant (e.g. `principal-consultant-accenture`)
+
+## Key design decision
+
+Variants store **only the overrides** (changed fields), not a full copy of your profile. When rendered, the master record is merged with overrides at read time. This means **updating your master profile automatically flows through to all variants**.
